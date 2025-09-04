@@ -1,0 +1,22 @@
+{
+  "name": "nestjs-opa",
+  "private": true,
+  "version": "0.0.0",
+  "license": "MIT",
+  "packageManager": "pnpm@8.15.4",
+  "scripts": {
+    "build": "echo \"noop build\"",
+    "lint": "eslint . --ext .ts --no-error-on-unmatched-pattern",
+    "test": "echo 'no tests yet'",
+    "e2e": "echo 'no e2e tests yet'"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "prettier": "^3.1.0",
+    "eslint-config-prettier": "^9.0.0",
+    "@changesets/cli": "^2.26.2"
+  }
+}
