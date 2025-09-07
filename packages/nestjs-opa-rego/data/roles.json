@@ -1,0 +1,8 @@
+{
+  "roles": {
+    "viewer": {"actions": ["home.read"]},
+    "operator": {"actions": ["camera.stream"]},
+    "babysitter": {"actions": ["camera.stream"]},
+    "admin": {"actions": ["home.read", "home.update", "camera.stream"]}
+  }
+}

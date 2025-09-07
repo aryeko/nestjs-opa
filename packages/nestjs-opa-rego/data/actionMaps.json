@@ -1,0 +1,15 @@
+{
+  "actionMaps": {
+    "action_to_perms": {
+      "home.read": ["home.read"],
+      "home.update": ["home.manage"],
+      "camera.stream": ["device_camera.view_camera"]
+    },
+    "scoped_actions": {
+      "camera.stream": true
+    },
+    "action_to_spicedb_perm": {
+      "camera.stream": "device_camera.view_camera"
+    }
+  }
+}
