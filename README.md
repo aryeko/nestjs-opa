@@ -8,6 +8,10 @@ A monorepo providing NestJS utilities for OPA authorization.
 - @arye/nestjs-opa-rego
 - @arye/nestjs-spicedb-writer
 
+## Examples
+
+- smarthome-api – sample Nest app using the packages
+
 ## Development
 
 ```bash
