@@ -1,0 +1,12 @@
+{
+  "name": "@arye/nestjs-opa-rego",
+  "version": "0.0.0",
+  "private": false,
+  "scripts": {
+    "build-bundle": "tsx src/cli/build-bundle.ts",
+    "test:policy": "opa test policy test"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0"
+  }
+}
