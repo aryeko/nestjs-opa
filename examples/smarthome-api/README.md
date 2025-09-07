@@ -11,7 +11,7 @@ pnpm -F smarthome-api start
 
 ## Compose environment
 
-After building packages, you can bring up the full stack with Docker:
+After building packages, bring up the full stack from this directory with Docker:
 
 ```bash
 docker compose up -d

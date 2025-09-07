@@ -57,7 +57,7 @@ services:
       '/policy/bundle'
     ]
     volumes:
-      - ./packages/nestjs-opa-rego/dist/bundle:/policy/bundle
+      - ../../packages/nestjs-opa-rego/dist/bundle:/policy/bundle
     ports:
       - '8181:8181'
     depends_on:
@@ -73,7 +73,7 @@ services:
     working_dir: /workspace/examples/smarthome-api
     command: ['node', 'dist/main.js']
     volumes:
-      - .:/workspace
+      - ../../:/workspace
     environment:
       DB_HOST: postgres-app
       DB_PORT: 5432

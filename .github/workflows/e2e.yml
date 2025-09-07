@@ -20,5 +20,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm -r build
       - run: docker compose up -d
+        working-directory: examples/smarthome-api
       - run: ./scripts/apply-schema.sh
+        working-directory: examples/smarthome-api
       - run: docker compose ps
+        working-directory: examples/smarthome-api
