@@ -18,4 +18,10 @@ jobs:
         with:
           node-version: 20
       - run: pnpm install --frozen-lockfile
-      - run: pnpm -F smarthome-api build
+      - run: pnpm -r build
+      - run: docker compose up -d
+        working-directory: examples/smarthome-api
+      - run: ./scripts/apply-schema.sh
+        working-directory: examples/smarthome-api
+      - run: docker compose ps
+        working-directory: examples/smarthome-api

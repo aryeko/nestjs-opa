@@ -1,0 +1,36 @@
+definition user {}
+
+definition home {
+  relation manage: user
+  relation viewer: user
+  permission read = viewer + manage
+  permission update = manage
+}
+
+definition device_group {
+  relation parent: home
+  relation view: user | home#viewer | home#manage
+  relation manage: user | home#manage
+  relation operate: user | home#manage
+  permission view = view
+  permission manage = manage
+  permission operate = operate
+}
+
+definition device_light {
+  relation parent: device_group
+  relation manage: user | device_group#manage
+  permission manage = manage
+}
+
+definition device_thermostat {
+  relation parent: device_group
+  relation manage: user | device_group#manage
+  permission manage = manage
+}
+
+definition device_camera {
+  relation parent: device_group
+  relation view_camera: user | device_group#view
+  permission view_camera = view_camera
+}

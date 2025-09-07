@@ -1,0 +1,94 @@
+version: '3.8'
+services:
+  postgres-app:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-smarthome}
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      retries: 10
+
+  spicedb-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: spicedb
+      POSTGRES_DB: spicedb
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      retries: 10
+
+  spicedb:
+    image: authzed/spicedb:latest
+    command: [
+      'serve',
+      '--datastore-engine=postgres',
+      '--datastore-conn-uri=postgres://postgres:spicedb@spicedb-db:5432/spicedb?sslmode=disable',
+      '--grpc-preshared-key=${SPICEDB_PRESHARED_KEY}',
+      '--grpc-no-tls',
+      '--http-no-tls'
+    ]
+    ports:
+      - '50051:50051'
+    depends_on:
+      spicedb-db:
+        condition: service_healthy
+    volumes:
+      - ./spicedb/schema.zed:/schema/schema.zed
+    healthcheck:
+      test: ['CMD', 'grpc_health_probe', '-addr=localhost:50051']
+      interval: 5s
+      retries: 10
+
+  opa:
+    image: ghcr.io/authzed/opa-with-spicedb:latest
+    command: [
+      'run','--server',
+      '--set=decision_logs.console=true',
+      '--set=plugins.spicedb.endpoint=spicedb:50051',
+      '--set=plugins.spicedb.token=${SPICEDB_PRESHARED_KEY}',
+      '--set=plugins.spicedb.insecure=true',
+      '/policy/bundle'
+    ]
+    volumes:
+      - ../../packages/nestjs-opa-rego/dist/bundle:/policy/bundle
+    ports:
+      - '8181:8181'
+    depends_on:
+      spicedb:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8181/health']
+      interval: 5s
+      retries: 10
+
+  api:
+    image: node:20
+    working_dir: /workspace/examples/smarthome-api
+    command: ['node', 'dist/main.js']
+    volumes:
+      - ../../:/workspace
+    environment:
+      DB_HOST: postgres-app
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: smarthome
+      OPA_URL: http://opa:8181
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres-app:
+        condition: service_healthy
+      opa:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/ping']
+      interval: 5s
+      retries: 10
