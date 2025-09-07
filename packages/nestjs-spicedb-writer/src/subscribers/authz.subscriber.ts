@@ -1,4 +1,9 @@
-import { EventSubscriber, EntitySubscriberInterface, InsertEvent, RemoveEvent } from 'typeorm';
+import {
+  EventSubscriber,
+  EntitySubscriberInterface,
+  InsertEvent,
+  RemoveEvent,
+} from 'typeorm';
 import { AuthzOutbox, AuthzOperation } from '../outbox.entity';
 
 export interface AuthzTuple {
@@ -17,19 +22,24 @@ export class AuthzOutboxSubscriber implements EntitySubscriberInterface {
     return Object;
   }
 
-  async afterInsert(event: InsertEvent<any>) {
-    await this.enqueue(event.manager, event.entity, 'insert');
+  async afterInsert(event: InsertEvent<unknown>) {
+    await this.enqueue(event.manager, event.entity as unknown, 'insert');
   }
 
-  async afterRemove(event: RemoveEvent<any>) {
-    const entity = event.entity ?? event.databaseEntity;
+  async afterRemove(event: RemoveEvent<unknown>) {
+    const entity = (event.entity ?? event.databaseEntity) as unknown;
     await this.enqueue(event.manager, entity, 'delete');
   }
 
-  private async enqueue(manager: InsertEvent<any>['manager'], entity: any, op: AuthzOperation) {
-    if (!entity || typeof entity.authzTuples !== 'function') return;
+  private async enqueue(
+    manager: InsertEvent<unknown>['manager'],
+    entity: unknown,
+    op: AuthzOperation,
+  ) {
+    const tuplable = entity as AuthzTuplable;
+    if (!tuplable || typeof tuplable.authzTuples !== 'function') return;
     const repo = manager.getRepository(AuthzOutbox);
-    for (const t of entity.authzTuples() as AuthzTuple[]) {
+    for (const t of tuplable.authzTuples()) {
       const row = repo.create({ ...t, operation: op });
       await repo.save(row);
     }
