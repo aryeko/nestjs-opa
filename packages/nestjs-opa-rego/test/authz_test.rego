@@ -2,6 +2,17 @@ package authz_test
 
 import data.authz
 
+roles := {
+  "viewer": {"actions": ["read"]},
+  "operator": {"actions": ["stream"]},
+  "babysitter": {"actions": ["stream"]},
+}
+
+actionMaps := {
+  "scoped_actions": {"stream": true},
+  "action_to_spicedb_perm": {"stream": "device.view"},
+}
+
 # Public routes allowed
 
 test_public_route_allowed if {
@@ -19,14 +30,14 @@ test_missing_decorator_denied if {
 # Unscoped RBAC allow/deny
 
 test_unscoped_rbac_allow if {
-  inp := {"subject": {"roles": ["viewer"]}, "endpoint": {"action": "home.read"}}
-  res := authz.result with input as inp
+  inp := {"subject": {"roles": ["viewer"]}, "endpoint": {"action": "read"}}
+  res := authz.result with input as inp with data.roles as roles with data.actionMaps as actionMaps
   res.allow
 }
 
 test_unscoped_rbac_deny if {
-  inp := {"subject": {"roles": ["viewer"]}, "endpoint": {"action": "home.update"}}
-  res := authz.result with input as inp
+  inp := {"subject": {"roles": ["viewer"]}, "endpoint": {"action": "update"}}
+  res := authz.result with input as inp with data.roles as roles with data.actionMaps as actionMaps
   not res.allow
 }
 
@@ -35,10 +46,10 @@ test_unscoped_rbac_deny if {
 test_scoped_allow if {
   inp := {
     "subject": {"roles": ["operator"]},
-    "endpoint": {"action": "camera.stream"},
-    "resource": {"permissions": ["device_camera.view_camera"]}
+    "endpoint": {"action": "stream"},
+    "resource": {"permissions": ["device.view"]},
   }
-  res := authz.result with input as inp
+  res := authz.result with input as inp with data.roles as roles with data.actionMaps as actionMaps
   res.allow
 }
 
@@ -48,10 +59,10 @@ test_time_window_pass if {
   inp := {
     "subject": {"roles": ["babysitter"], "window": {"start": 1, "end": 10}},
     "request": {"time": 5},
-    "endpoint": {"action": "camera.stream"},
-    "resource": {"permissions": ["device_camera.view_camera"]}
+    "endpoint": {"action": "stream"},
+    "resource": {"permissions": ["device.view"]},
   }
-  res := authz.result with input as inp
+  res := authz.result with input as inp with data.roles as roles with data.actionMaps as actionMaps
   res.allow
 }
 
@@ -59,9 +70,9 @@ test_time_window_fail if {
   inp := {
     "subject": {"roles": ["babysitter"], "window": {"start": 1, "end": 10}},
     "request": {"time": 15},
-    "endpoint": {"action": "camera.stream"},
-    "resource": {"permissions": ["device_camera.view_camera"]}
+    "endpoint": {"action": "stream"},
+    "resource": {"permissions": ["device.view"]},
   }
-  res := authz.result with input as inp
+  res := authz.result with input as inp with data.roles as roles with data.actionMaps as actionMaps
   not res.allow
 }

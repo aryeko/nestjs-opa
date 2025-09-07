@@ -7,12 +7,17 @@ async function main() {
   const revision = process.env.BUNDLE_REVISION || 'dev';
 
   await fs.rm(dist, { recursive: true, force: true });
-  await fs.mkdir(path.join(dist, 'data'), { recursive: true });
+  await fs.mkdir(dist, { recursive: true });
 
-  await fs.copyFile(path.join(root, 'policy', 'authz.rego'), path.join(dist, 'authz.rego'));
-  const dataFiles = ['roles.json', 'actionMaps.json'];
-  for (const f of dataFiles) {
-    await fs.copyFile(path.join(root, 'data', f), path.join(dist, 'data', f));
+  // copy policy files
+  await fs.cp(path.join(root, 'policy'), dist, { recursive: true });
+
+  // copy data directory if present
+  const dataSrc = path.join(root, 'data');
+  try {
+    await fs.cp(dataSrc, path.join(dist, 'data'), { recursive: true });
+  } catch (err: any) {
+    if (err.code !== 'ENOENT') throw err;
   }
 
   const manifest = { revision };

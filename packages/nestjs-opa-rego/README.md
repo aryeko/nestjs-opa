@@ -1,6 +1,6 @@
 # @arye/nestjs-opa-rego
 
-Rego policy bundle for `nestjs-opa`. Includes RBAC/ReBAC policy and data.
+Rego policy bundle for `nestjs-opa`. Ships a generic RBAC/ReBAC policy and a CLI to bundle it with your app's data.
 
 ## Usage
 
@@ -8,7 +8,7 @@ Rego policy bundle for `nestjs-opa`. Includes RBAC/ReBAC policy and data.
 pnpm -F @arye/nestjs-opa-rego build-bundle
 ```
 
-Bundles `policy/authz.rego` and data files into `dist/bundle` with a `.manifest`.
+Bundles files under `policy/` (and `data/` if present) into `dist/bundle` with a `.manifest`.
 
 Run policy tests with:
 
